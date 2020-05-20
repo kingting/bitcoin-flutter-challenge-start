@@ -10,6 +10,8 @@ class PriceScreen extends StatefulWidget {
 
 class _PriceScreenState extends State<PriceScreen> {
   String selectedCurrency = 'USD';
+  int displayRate;
+  CoinData coinData;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -42,7 +44,10 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        //print(selectedIndex);
+        String currency = currenciesList[selectedIndex];
+        getData(currency);
+
       },
       children: pickerItems,
     );
@@ -50,10 +55,22 @@ class _PriceScreenState extends State<PriceScreen> {
 
   //TODO: Create a method here called getData() to get the coin data from coin_data.dart
 
+  Future getData(String currency) async {
+    var coinData = await CoinData().getCoinData(currency);
+    print(coinData);
+    double rate = coinData['rate'];
+    print('Rate $rate');
+    setState(() {
+      selectedCurrency = currency;
+      displayRate = rate.round();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     //TODO: Call getData() when the screen loads up.
+    getData('USD');
   }
 
   @override
@@ -78,7 +95,7 @@ class _PriceScreenState extends State<PriceScreen> {
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
                   //TODO: Update the Text Widget with the live bitcoin data here.
-                  '1 BTC = ? USD',
+                  '1 BTC = $displayRate $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
